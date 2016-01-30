@@ -13,13 +13,9 @@ var kCanvas = {
     }
 };
 
-// game status
-var gameStarted = false;
-var gameOver = false;
-
 var kEnemies = {
-    "maxCount":3,
-    "startingX":0,
+    "maxCount":5,
+    "startingX":-100,
     "startingY":60
 };
 
@@ -29,11 +25,21 @@ var kPlayer = {
     "lives":3
 };
 
+var gameIsOver = false;
+var prizeIsTaken = false;
+
 // helpers
 // createRandomNumber function creates a random number between min and max included:
 var randomNumber = function(min, max) {
    return number = Math.floor(Math.random() * (max+1 - min)) + min;
 }
+
+var gameOver = function() {
+    gameIsOver = true;
+    $('body').append('<div class="alert alert-danger text-center" id="alert">Game Over!, press space bar to play again.</div>');
+}
+
+
 
 // Enemies our player must avoid
 var Enemy = function(x, y) {
@@ -54,6 +60,12 @@ Enemy.prototype.update = function(dt) {
     // we ensure the game will run at the same speed for
     // all computers.
     this.x  = this.x + 100 * dt * this.speed;
+    if (this.x >= kCanvas.width) {
+        this.x = kEnemies.startingX;
+        var randomLine = randomNumber(0, 3);
+        this.y = kEnemies.startingY + (kCanvas.block.height * randomLine);
+        this.speed = randomNumber(1,5);
+    }
 };
 
 // Draw the enemy on the screen, required method for game
@@ -72,7 +84,6 @@ function createEnemies() {
 }
 
 
-
 // Now write your own player class
 // This class requires an update(), render() and
 // a handleInput() method.
@@ -82,13 +93,30 @@ var Player = function(x, y) {
     this.x = x;
     this.y = y;
     this.currentBlock = {
-        "x":2,
-        "y":0
+        "row":4,
+        "column":2
     }
     this.lives = kPlayer.lives;
 };
 
 Player.prototype.update = function(dt) {
+    for (var enemy in allEnemies) {
+        if ((Math.abs(this.x - allEnemies[enemy].x) <= 50) && (Math.abs(this.y - allEnemies[enemy].y) <= 50)) {
+            this.lives--;
+            this.x = kPlayer.startingX;
+            this.y = kPlayer.startingY;
+            this.currentBlock = {
+                "row":4,
+                "column":2
+            }
+        }
+    }
+
+    if (this.lives < 1) {
+        if (!gameIsOver) {
+            gameOver();
+        };
+    };
 };
 
 Player.prototype.render = function() {
@@ -97,53 +125,91 @@ Player.prototype.render = function() {
 
 Player.prototype.handleInput = function(key) {
 
-  switch (key) {
+    if (this.lives > 0) {
 
-    case 'right':
-        if (this.currentBlock.x < 4) {
-            console.log(key)
-            this.x += kCanvas.block.width;
-            this.currentBlock.x++;
-        };
-        break;
+        switch (key) {
 
-    case 'left':
-        if (this.currentBlock.x > 0) {
-            console.log(key)
-            this.x -= kCanvas.block.width;
-            this.currentBlock.x--;
-        };
-        break;
+        case 'right':
+            if (this.currentBlock.column < 4) {
+                this.x += kCanvas.block.width;
+                this.currentBlock.column++;
+            };
+            break;
 
-    case 'up':
-        if (this.currentBlock.y < 5) {
-            console.log(key)
-            this.y -= kCanvas.block.height;
-            this.currentBlock.y++;
-        };
-        break;
+        case 'left':
+            if (this.currentBlock.column > 0) {
+                this.x -= kCanvas.block.width;
+                this.currentBlock.column--;
+            };
+            break;
 
-    case 'down':
-        if (this.currentBlock.y > 0) {
-            console.log(key)
-            this.y += kCanvas.block.height;
-            this.currentBlock.y--;
-        };
+        case 'up':
+            if (this.currentBlock.row > 0) {
+                this.y -= kCanvas.block.height;
+                this.currentBlock.row--;
+            } else {
+                this.lives--;
+                this.y = kPlayer.startingY;
+                this.currentBlock.y = 0;
+            };
 
-        break;
+            if (this.lives == 0) {
+                gameOver();
+            };
 
-    default:
-        break;
-  }
+            break;
 
+        case 'down':
+            if (this.currentBlock.row < 4) {
+                this.y += kCanvas.block.height;
+                this.currentBlock.row++;
+            };
+            break;
+
+        default:
+            break;
+        }
+
+    } else {
+        
+        if (key == 'space') {
+            gameIsOver = false;
+            this.lives = 3;
+            $("#alert").fadeTo(200, 500).slideUp(100, function(){
+                $("#alert").alert('close');
+            });
+        }
+    };
+
+    console.log(this.currentBlock.row);
+    console.log(this.currentBlock.column);
 
 };
 
-// Now instantiate your objects.
-// Place all enemy objects in an array called allEnemies
-// Place the player object in a variable called player
+var Prize = function(row, column) {
+    this.row = row;
+    this.column = column;
+    this.sprite = 'images/Star.png';
+    this.y = 70 + kCanvas.block.height * row;
+    this.x = kCanvas.block.width * column;
+}
 
+Prize.prototype.render = function() {
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+};
 
+Prize.prototype.update = function() {
+    if (this.row == player.currentBlock.row && this.column == player.currentBlock.column) {
+        console.log('prize taken');
+        var randomRow = randomNumber(0, 3);
+        var randomColumn = randomNumber(0, 4);
+
+        this.row = randomRow;
+        this.column = randomColumn;
+        this.y = 70 + kCanvas.block.height * randomRow;
+        this.x = kCanvas.block.width * randomColumn;
+    };
+};
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
@@ -153,13 +219,20 @@ document.addEventListener('keydown', function(e) {
         38:'up',
         39:'right',
         40:'down',
-        32:'space' // for jump
+        32:'space' // to restart the game
     };
-
     player.handleInput(allowedKeys[e.keyCode]);
 });
 
+function createPrize() {
+    var randomRow = randomNumber(0, 3);
+    var randomColumn = randomNumber(0, 4);
+    var prize = new Prize(randomRow, randomColumn);
+    return prize;
 
+}
+
+var prize = createPrize();
 var player = new Player(kPlayer.startingX, kPlayer.startingY);
 // All enemy objects  are places in allEnemies array
 var allEnemies = [];
