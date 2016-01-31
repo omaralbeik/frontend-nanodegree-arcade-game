@@ -14,7 +14,7 @@ var kCanvas = {
 };
 
 var kEnemies = {
-    "maxCount":5,
+    "maxCount":4,
     "startingX":-100,
     "startingY":60
 };
@@ -26,7 +26,8 @@ var kPlayer = {
 };
 
 var gameIsOver = false;
-var prizeIsTaken = false;
+
+var starsCollected = 0;
 
 // helpers
 // createRandomNumber function creates a random number between min and max included:
@@ -36,9 +37,11 @@ var randomNumber = function(min, max) {
 
 var gameOver = function() {
     gameIsOver = true;
-    $('body').append('<div class="alert alert-danger text-center" id="alert">Game Over!, press space bar to play again.</div>');
+    $('body').append('<div class="container"><div class="alert alert-danger text-center" id="alert">Game Over!, press space bar to play again.</div></div>');
 }
 
+var $lives = $('#lives');
+var $stars = $('#stars');
 
 
 // Enemies our player must avoid
@@ -117,6 +120,7 @@ Player.prototype.update = function(dt) {
             gameOver();
         };
     };
+    $lives.text(this.lives);
 };
 
 Player.prototype.render = function() {
@@ -175,14 +179,13 @@ Player.prototype.handleInput = function(key) {
         if (key == 'space') {
             gameIsOver = false;
             this.lives = 3;
+            starsCollected = 0;
+            $stars.text(starsCollected);
             $("#alert").fadeTo(200, 500).slideUp(100, function(){
                 $("#alert").alert('close');
             });
         }
     };
-
-    console.log(this.currentBlock.row);
-    console.log(this.currentBlock.column);
 
 };
 
@@ -201,6 +204,8 @@ Prize.prototype.render = function() {
 Prize.prototype.update = function() {
     if (this.row == player.currentBlock.row && this.column == player.currentBlock.column) {
         console.log('prize taken');
+        starsCollected++;
+        $stars.text(starsCollected);
         var randomRow = randomNumber(0, 3);
         var randomColumn = randomNumber(0, 4);
 

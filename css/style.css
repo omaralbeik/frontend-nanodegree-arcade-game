@@ -1,3 +1,19 @@
 body {
     text-align: center;
 }
+
+h3 {
+	margin-top: 0px;
+	margin-bottom: -20px;
+}
+
+.container {
+	width: 505px;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+
+.icon {
+	width: 40px;
+}
