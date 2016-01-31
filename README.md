@@ -9,6 +9,9 @@ For detailed instructions on how to get started, check out this [guide](https://
 instructions on how to play
 ============================
 
+- download the entire project, unzip the file if zipped
+- run index.html file in browser
+
 - use arrow keys in keyboard to move the player
 - collect the stars
 - don't jump into the water
