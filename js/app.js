@@ -64,9 +64,9 @@ var gameOver = function() {
 };
 
 var showAlert = function(alertString) {
-  $('body').append('<div class="container"><div class="alert alert-warning text-center" id="notification">' + alertString + '</div></div>');
-  $("#notification").fadeTo(3000, 500).slideUp(100, function() {
-    $("#notification").alert('close');
+  $('body').append('<div class="container"><div class="alert alert-warning text-center notification">' + alertString + '</div></div>');
+  $(".notification").fadeTo(3000, 500).slideUp(100, function() {
+    $(".notification").alert('close');
   });
 };
 
