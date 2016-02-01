@@ -2,39 +2,39 @@
 
 // kCanvas object contains all constants for HTML canvas
 var kCanvas = {
-  "width": 505,
-  "height": 606,
-  "grid": {
-    "rows": 6, // see engine.js for more info on how rows are ordered.
-    "columns": 5
+  width: 505,
+  height: 606,
+  grid: {
+    rows: 6, // see engine.js for more info on how rows are ordered.
+    columns: 5
   },
-  "block": {
+  block: {
     // size of each block in canvas.
-    "width": 101,
-    "height": 83
+    width: 101,
+    height: 83
   }
 };
 
 // kEnemies object contains all constants for enemy objects
 var kEnemies = {
-  "maxCount": 4, // number of enemies that appear at the same time
+  maxCount: 4, // number of enemies that appear at the same time
   // stating point for enemies, by starting x from outside the canvas
   // it will look like they are entering.
-  "startingX": -120,
-  "startingY": 60,
-  "minSpeed": 1, // change minimum speed of enemies here. (should be > 0).
-  "maxSpeed": 5 // change maximum speed of enemies here. (should be > minSpeed)
+  startingX: -120,
+  startingY: 60,
+  minSpeed: 1, // change minimum speed of enemies here. (should be > 0).
+  maxSpeed: 5 // change maximum speed of enemies here. (should be > minSpeed)
 };
 
 // kPlayer object contains all constants for player objects
 var kPlayer = {
-  "startingX": 202,
-  "startingY": 386,
-  "lives": 3, // change this to change the number of lives
+  startingX: 202,
+  startingY: 386,
+  lives: 3, // change this to change the number of lives
   // initial block user starts from.
-  "initialBlock": {
-    "row": 4,
-    "column": 2
+  initialBlock: {
+    row: 4,
+    column: 2
   }
 };
 
@@ -54,21 +54,21 @@ var $stars = $('#stars');
 
 // createRandomNumber function creates a random number between min and max included:
 var randomNumber = function(min, max) {
-  return number = Math.floor(Math.random() * (max + 1 - min)) + min;
-}
+  return Math.floor(Math.random() * (max + 1 - min)) + min;
+};
 
 // gameOver function shows alert when game is over
 var gameOver = function() {
   gameIsOver = true;
   $('body').append('<div class="container"><div class="alert alert-danger text-center" id="alert"><strong>Game Over!</strong>, press space bar to play again.</div></div>');
-}
+};
 
 var showAlert = function(alertString) {
   $('body').append('<div class="container"><div class="alert alert-warning text-center" id="notification">' + alertString + '</div></div>');
   $("#notification").fadeTo(3000, 500).slideUp(100, function() {
     $("#notification").alert('close');
   });
-}
+};
 
 
 
@@ -157,8 +157,8 @@ Player.prototype.update = function(dt) {
     // each time
     if (!gameIsOver) {
       gameOver();
-    };
-  };
+    }
+  }
 
   // update lives title
   $lives.text(this.lives);
@@ -185,7 +185,7 @@ Player.prototype.handleInput = function(key) {
         if (this.currentColumn < 4) {
           this.x += kCanvas.block.width;
           this.currentColumn++;
-        };
+        }
         break;
 
       case 'left':
@@ -193,7 +193,7 @@ Player.prototype.handleInput = function(key) {
         if (this.currentColumn > 0) {
           this.x -= kCanvas.block.width;
           this.currentColumn--;
-        };
+        }
         break;
 
       case 'up':
@@ -213,7 +213,7 @@ Player.prototype.handleInput = function(key) {
             showAlert("<strong>-1 </strong>You can't jump into water!");
           }
 
-        };
+        }
         break;
 
       case 'down':
@@ -221,7 +221,7 @@ Player.prototype.handleInput = function(key) {
         if (this.currentRow < 4) {
           this.y += kCanvas.block.height;
           this.currentRow++;
-        };
+        }
         break;
 
       default:
@@ -240,7 +240,7 @@ Player.prototype.handleInput = function(key) {
         $("#alert").alert('close');
       });
     }
-  };
+  }
 
 };
 
@@ -255,7 +255,7 @@ var Star = function(row, column) {
   this.sprite = 'images/Star.png';
   this.y = 70 + kCanvas.block.height * row;
   this.x = kCanvas.block.width * column;
-}
+};
 
 // Draw the star on the screen, required method for game
 // refer to engine.js for more info.
@@ -277,7 +277,7 @@ Star.prototype.update = function() {
     this.column = randomColumn;
     this.y = 70 + kCanvas.block.height * randomRow;
     this.x = kCanvas.block.width * randomColumn;
-  };
+  }
 };
 
 // helper function to create the star for the first time the game
